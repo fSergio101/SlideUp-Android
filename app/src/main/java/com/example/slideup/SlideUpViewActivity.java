@@ -43,7 +43,6 @@ public class SlideUpViewActivity extends AppCompatActivity {
                         }
                     }
                 })
-                .withStartGravity(Gravity.BOTTOM)
                 .withLoggingEnabled(true)
                 .withGesturesEnabled(true)
                 .withStartState(SlideUp.State.HIDDEN)

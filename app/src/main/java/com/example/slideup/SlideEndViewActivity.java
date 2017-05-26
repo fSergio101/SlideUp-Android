@@ -43,7 +43,6 @@ public class SlideEndViewActivity extends AppCompatActivity {
                         }
                     }
                 })
-                .withStartGravity(Gravity.END)
                 .withLoggingEnabled(true)
                 .withStartState(SlideUp.State.HIDDEN)
                 .build();

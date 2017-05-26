@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,6 +12,7 @@ import android.view.View;
 import com.mancj.slideup.SlideUp;
 
 public class SlideStartViewActivity extends AppCompatActivity {
+
     private SlideUp slideUp;
     private View dim;
     private View sliderView;
@@ -35,15 +35,14 @@ public class SlideStartViewActivity extends AppCompatActivity {
                     public void onSlide(float percent) {
                         dim.setAlpha(1 - (percent / 100));
                     }
-    
+
                     @Override
                     public void onVisibilityChanged(int visibility) {
-                        if (visibility == View.GONE){
+                        if (visibility == View.GONE) {
                             fab.show();
                         }
                     }
                 })
-                .withStartGravity(Gravity.START)
                 .withLoggingEnabled(true)
                 .withStartState(SlideUp.State.HIDDEN)
                 .build();
@@ -63,10 +62,10 @@ public class SlideStartViewActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_slide_start_view, menu);
         return true;
     }
-    
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_slide_up:
                 startActivity(new Intent(this, SlideUpViewActivity.class));
                 break;

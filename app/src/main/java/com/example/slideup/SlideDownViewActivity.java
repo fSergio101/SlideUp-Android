@@ -43,7 +43,6 @@ public class SlideDownViewActivity extends AppCompatActivity {
                         }
                     }
                 })
-                .withStartGravity(Gravity.TOP)
                 .withLoggingEnabled(true)
                 .withStartState(SlideUp.State.HIDDEN)
                 .build();
