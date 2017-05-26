@@ -19,12 +19,58 @@
         android:layout_marginTop="26dp"
         android:background="@drawable/rounded_up_corners_bg">
 
-        <ImageView
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/mushroom"
-            android:id="@+id/imageView2"
-            android:layout_marginTop="24dp"/>
+            android:layout_alignParentBottom="true"
+            android:layout_below="@+id/textView"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    app:srcCompat="@drawable/mushroom"
+                    android:id="@+id/imageView2"
+                    />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    app:srcCompat="@drawable/mushroom"
+                    />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    app:srcCompat="@drawable/mushroom"
+                    />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    app:srcCompat="@drawable/mushroom"
+                    />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    app:srcCompat="@drawable/mushroom"
+                    />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    app:srcCompat="@drawable/mushroom"
+                    />
+
+            </LinearLayout>
+
+        </ScrollView>
 
         <ImageView
             android:layout_below="@+id/textView"
