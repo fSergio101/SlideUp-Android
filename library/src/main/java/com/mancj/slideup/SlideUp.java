@@ -49,6 +49,8 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
          * State hidden is equal {@link View#GONE}
          */
         HIDDEN,
+        COLLAPSED,
+        STOPPED,
 
         /**
          * State showed is equal {@link View#VISIBLE}
@@ -150,7 +152,7 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
          */
         public Builder(@NonNull View sliderView) {
             this.sliderView = sliderView;
-            density = sliderView.getResources().getDisplayMetrics().density;
+            density = sliderView.getContext().getResources().getDisplayMetrics().density;
             touchableArea = 300 * density;
         }
 

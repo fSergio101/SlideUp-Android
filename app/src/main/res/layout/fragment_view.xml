@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/content_slide_up_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingLeft="@dimen/activity_horizontal_half_margin"
+                android:paddingRight="@dimen/activity_horizontal_half_margin"
+                tools:context="com.example.slideup.SlideUpViewActivity"
+                tools:showIn="@layout/activity_slide_up_view">
+
+    <RelativeLayout
+        android:id="@+id/slideView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="26dp"
+        android:background="@drawable/rounded_up_corners_bg">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@+id/imageView"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    app:srcCompat="@drawable/mushroom"
+                    android:id="@+id/imageView2"
+                    />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    app:srcCompat="@drawable/mushroom"
+                    />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    app:srcCompat="@drawable/mushroom"
+                    />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    app:srcCompat="@drawable/mushroom"
+                    />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    app:srcCompat="@drawable/mushroom"
+                    />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    app:srcCompat="@drawable/mushroom"
+                    />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+        <ImageView
+            android:layout_below="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_keyboard_arrow_down_black_24dp"
+            android:id="@+id/imageView"
+            android:layout_marginTop="4dp"/>
+
+        <TextView
+            android:layout_alignParentTop="true"
+            android:text="Slide it down"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView"
+            android:gravity="center_horizontal"
+            android:textColor="@color/grey200"
+            android:layout_marginTop="16dp"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>
