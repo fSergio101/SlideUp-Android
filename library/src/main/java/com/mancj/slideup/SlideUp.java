@@ -49,8 +49,7 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
          * State hidden is equal {@link View#GONE}
          */
         HIDDEN,
-        COLLAPSED,
-        STOPPED,
+        MIDDLE,
 
         /**
          * State showed is equal {@link View#VISIBLE}
@@ -352,6 +351,9 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
             case SHOWED:
                 showImmediately();
                 break;
+            case MIDDLE:
+                show();
+                break;
         }
     }
 
@@ -594,7 +596,7 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
                 startState = SHOWED;
             }
         } else {
-            this.slideAnimationTo = 0;
+            this.slideAnimationTo = 750;
             valueAnimator.setFloatValues(sliderView.getTranslationY(), slideAnimationTo);
             valueAnimator.start();
         }
@@ -646,16 +648,21 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
                 if (slideAnimationFrom == viewStartPositionY) {
                     return false;
                 }
-                boolean mustShow = maxSlidePosition > event.getRawY();
-                boolean scrollableAreaConsumed = sliderView.getTranslationY()
-                        > sliderView.getHeight() / 5;
-
-                if (scrollableAreaConsumed && !mustShow) {
-                    slideAnimationTo = sliderView.getHeight();
-                } else {
-                    slideAnimationTo = 0;
+//                boolean mustShow = maxSlidePosition > event.getRawY();
+//                boolean scrollableAreaConsumed = sliderView.getTranslationY()
+//                        > sliderView.getHeight() / 5;
+//
+//                if (scrollableAreaConsumed && !mustShow) {
+//                    slideAnimationTo = sliderView.getHeight();
+//                } else {
+//                    slideAnimationTo = 0;
+//                }
+                float stop = 0;
+                if (slideAnimationFrom > 300) {
+                    stop = 750;
                 }
-                valueAnimator.setFloatValues(slideAnimationFrom, slideAnimationTo);
+                slideAnimationTo = stop;
+                valueAnimator.setFloatValues(slideAnimationFrom, stop);
                 valueAnimator.start();
                 canSlide = true;
                 maxSlidePosition = 0;
@@ -733,7 +740,7 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
     public final void onAnimationEnd(Animator animator) {
         if (slideAnimationTo != 0) {
             if (sliderView.getVisibility() != GONE) {
-                sliderView.setVisibility(GONE);
+//                sliderView.setVisibility(GONE);
                 notifyVisibilityChanged(GONE);
             }
         }
