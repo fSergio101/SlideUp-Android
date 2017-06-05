@@ -27,7 +27,7 @@ public class SlideStartViewActivity extends AppCompatActivity {
     private void initSlider() {
         new SlideUp.Builder((SlidingContentContainer) findViewById(R.id.slidingContentContainer))
                 .withLoggingEnabled(true)
-                .withStartState(SlideUp.State.STOP)
+//                .withStartState(SlideUp.State.INITIAL)
                 .build();
     }
 

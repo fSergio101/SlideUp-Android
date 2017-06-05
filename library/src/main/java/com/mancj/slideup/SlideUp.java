@@ -47,6 +47,7 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
          * State hidden is equal {@link View#GONE}
          */
         HIDDEN,
+        INITIAL,
         STOP,
 
         /**
@@ -91,9 +92,13 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
                 return new State[size];
             }
         };
+
+        public float getPosition() {
+            return position;
+        }
     }
 
-    private State startState;
+    //    private State startState;
     private State currentState;
     private SlidingContentContainer slidingContentContainer;
     private int autoSlideDuration;
@@ -146,7 +151,7 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
     public final static class Builder {
 
         private SlidingContentContainer slidingContentContainer;
-        private State startState = HIDDEN;
+        //        private State startState = HIDDEN;
         private List<Listener> listeners = new ArrayList<>();
         private boolean debug = false;
         private int autoSlideDuration = 300;
@@ -160,15 +165,15 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
             this.slidingContentContainer = sliderView;
         }
 
-        /**
-         * <p>Define a start state on screen</p>
-         *
-         * @param startState <b>(default - <b color="#EF6C00">{@link State#HIDDEN}</b>)</b>
-         */
-        public Builder withStartState(@NonNull State startState) {
-            this.startState = startState;
-            return this;
-        }
+//        /**
+//         * <p>Define a start state on screen</p>
+//         *
+//         * @param startState <b>(default - <b color="#EF6C00">{@link State#HIDDEN}</b>)</b>
+//         */
+//        public Builder withStartState(@NonNull State startState) {
+//            this.startState = startState;
+//            return this;
+//        }
 
         /**
          * <p>Define a {@link Listener} for this SlideUp</p>
@@ -260,9 +265,9 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
             if (savedState == null) {
                 return;
             }
-            if (savedState.getParcelable(KEY_STATE) != null) {
-                startState = savedState.getParcelable(KEY_STATE);
-            }
+//            if (savedState.getParcelable(KEY_STATE) != null) {
+//                startState = savedState.getParcelable(KEY_STATE);
+//            }
             debug = savedState.getBoolean(KEY_DEBUG, debug);
             autoSlideDuration = savedState.getInt(KEY_AUTO_SLIDE_DURATION, autoSlideDuration);
             hideKeyboard = savedState.getBoolean(KEY_HIDE_SOFT_INPUT, hideKeyboard);
@@ -295,7 +300,7 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
     private SlideUp(Builder builder) {
         listeners = builder.listeners;
         slidingContentContainer = builder.slidingContentContainer;
-        startState = builder.startState;
+//        startState = builder.startState;
         autoSlideDuration = builder.autoSlideDuration;
         debug = builder.debug;
         hideKeyboard = builder.hideKeyboard;
@@ -312,7 +317,7 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
                     public void onGlobalLayout() {
                         viewHeight = slidingContentContainer.getHeight();
                         slidingContentContainer.setPivotY(0);
-                        updateToCurrentState();
+//                        updateToCurrentState();
                         ViewTreeObserver observer = slidingContentContainer.getViewTreeObserver();
                         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
                             observer.removeGlobalOnLayoutListener(this);
@@ -321,22 +326,23 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
                         }
                     }
                 });
-        updateToCurrentState();
+//        updateToCurrentState();
+        show();
     }
 
-    private void updateToCurrentState() {
-        switch (startState) {
-            case HIDDEN:
-                hideImmediately();
-                break;
-            case SHOWED:
-                showImmediately();
-                break;
-            case STOP:
-                show();
-                break;
-        }
-    }
+//    private void updateToCurrentState() {
+//        switch (startState) {
+//            case HIDDEN:
+//                hideImmediately();
+//                break;
+//            case SHOWED:
+//                showImmediately();
+//                break;
+//            case INITIAL:
+//                show();
+//                break;
+//        }
+//    }
 
     /**
      * <p>Returns the visibility status for this view.</p>
@@ -518,38 +524,40 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
 
     private void hide(boolean immediately) {
         endAnimation();
-        if (immediately) {
-            if (slidingContentContainer.getHeight() > 0) {
-                slidingContentContainer.setTranslationY(viewHeight);
-                slidingContentContainer.setVisibility(GONE);
-                notifyVisibilityChanged(GONE);
-            } else {
-                startState = HIDDEN;
-            }
-        } else {
-            this.slideAnimationTo = slidingContentContainer.getHeight();
-            valueAnimator
-                    .setFloatValues(slidingContentContainer.getTranslationY(), slideAnimationTo);
-            valueAnimator.start();
-        }
+//        if (immediately) {
+//            if (slidingContentContainer.getHeight() > 0) {
+//                slidingContentContainer.setTranslationY(viewHeight);
+//                slidingContentContainer.setVisibility(GONE);
+//                notifyVisibilityChanged(GONE);
+//            } else {
+//                startState = HIDDEN;
+//            }
+//        } else {
+        this.slideAnimationTo = slidingContentContainer.getHeight();
+        valueAnimator
+                .setFloatValues(slidingContentContainer.getTranslationY(), slideAnimationTo);
+        valueAnimator.start();
+//        }
     }
 
     private void show(boolean immediately) {
         endAnimation();
-        if (immediately) {
-            if (slidingContentContainer.getHeight() > 0) {
-                slidingContentContainer.setTranslationY(0);
-                slidingContentContainer.setVisibility(VISIBLE);
-                notifyVisibilityChanged(VISIBLE);
-            } else {
-                startState = SHOWED;
-            }
-        } else {
-            this.slideAnimationTo = 750;
-            valueAnimator
-                    .setFloatValues(slidingContentContainer.getTranslationY(), slideAnimationTo);
-            valueAnimator.start();
-        }
+//        if (immediately) {
+//            if (slidingContentContainer.getHeight() > 0) {
+//                slidingContentContainer.setTranslationY(0);
+//                slidingContentContainer.setVisibility(VISIBLE);
+//                notifyVisibilityChanged(VISIBLE);
+//            } else {
+//                startState = SHOWED;
+//            }
+//        } else {
+        currentState = slidingContentContainer.getInitialState();
+
+        this.slideAnimationTo = currentState.position;
+        valueAnimator
+                .setFloatValues(slidingContentContainer.getTranslationY(), slideAnimationTo);
+        valueAnimator.start();
+//        }
     }
 
     private void createAnimation() {
@@ -593,12 +601,13 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
                 if (slideAnimationFrom == viewStartPositionY) {
                     return false;
                 }
-                float stop = 0;
-                if (slideAnimationFrom > 300) {
-                    stop = 750;
-                }
-                slideAnimationTo = stop;
-                valueAnimator.setFloatValues(slideAnimationFrom, stop);
+                currentState = slidingContentContainer
+                        .computeFollowingStop(
+                                viewStartPositionY,
+                                slideAnimationFrom,
+                                currentState);
+                slideAnimationTo = currentState.position;
+                valueAnimator.setFloatValues(slideAnimationFrom, slideAnimationTo);
                 valueAnimator.start();
                 maxSlidePosition = 0;
                 break;
@@ -676,7 +685,7 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
         if (slideAnimationTo != 0) {
             if (slidingContentContainer.getVisibility() != GONE) {
 //                slidingContentContainer.setVisibility(GONE);
-                notifyVisibilityChanged(GONE);
+//                notifyVisibilityChanged(GONE);
             }
         }
     }

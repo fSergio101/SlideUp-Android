@@ -17,6 +17,7 @@ public class SlidingContentContainer extends FrameLayout {
     private ViewDragHelper dragHelper;
     private DragViewHelperCallback dragHelperCallback;
     private ViewGroup rootView;
+    private SlideUp.State initialState;
 
     public SlidingContentContainer(@NonNull Context context) {
         super(context);
@@ -59,6 +60,41 @@ public class SlidingContentContainer extends FrameLayout {
         if (dragHelper.continueSettling(true)) {
             ViewCompat.postInvalidateOnAnimation(this);
         }
+    }
+
+    public SlideUp.State computeFollowingStop(
+            float viewStartPositionY,
+            float slideAnimationFrom,
+            SlideUp.State currentState) {
+        float delta = slideAnimationFrom - viewStartPositionY;
+        float scrollTo = normalize(delta, viewStartPositionY);
+        SlideUp.State state = SlideUp.State.STOP;
+        state.setPosition(scrollTo);
+        return state;
+    }
+
+    private float normalize(float delta, float previous) {
+        if (delta < 0) {
+            //subir
+            if (delta < -50) {
+                return previous - 100;
+            } else {
+                return previous;
+            }
+        } else {
+            //subir
+            if (delta > 50) {
+                return previous + 100;
+            } else {
+                return previous;
+            }
+        }
+    }
+
+    public SlideUp.State getInitialState() {
+        SlideUp.State state = SlideUp.State.STOP;
+        state.setPosition(750);
+        return state;
     }
 
     private class DragViewHelperCallback extends ViewDragHelper.Callback {
