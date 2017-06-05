@@ -6,7 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class FragmentSample extends Fragment {
+import com.mancj.slideup.SliderContent;
+
+public class FragmentSample extends Fragment implements SliderContent {
 
     private View view;
 

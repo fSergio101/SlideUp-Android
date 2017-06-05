@@ -33,9 +33,7 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
 
     private final static String TAG = "SlideUp";
 
-    private final static String KEY_START_GRAVITY = TAG + "_start_gravity";
     private final static String KEY_DEBUG = TAG + "_debug";
-    private final static String KEY_TOUCHABLE_AREA = TAG + "_touchable_area";
     private final static String KEY_STATE = TAG + "_state";
     private final static String KEY_AUTO_SLIDE_DURATION = TAG + "_auto_slide_duration";
     private final static String KEY_HIDE_SOFT_INPUT = TAG + "_hide_soft_input";
@@ -97,8 +95,7 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
 
     private State startState;
     private State currentState;
-    private View sliderView;
-    private float touchableArea;
+    private SlidingContentContainer slidingContentContainer;
     private int autoSlideDuration;
     private List<Listener> listeners;
 
@@ -107,13 +104,10 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
 
     private float startPositionY;
     private float viewStartPositionY;
-    private boolean canSlide = true;
-    private float density;
     private float maxSlidePosition;
     private float viewHeight;
     private boolean hideKeyboard;
     private TimeInterpolator interpolator;
-    private boolean gesturesEnabled;
     private boolean debug;
 
     /**
@@ -151,24 +145,19 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
      */
     public final static class Builder {
 
-        private View sliderView;
-        private float density;
-        private float touchableArea;
+        private SlidingContentContainer slidingContentContainer;
         private State startState = HIDDEN;
         private List<Listener> listeners = new ArrayList<>();
         private boolean debug = false;
         private int autoSlideDuration = 300;
-        private boolean gesturesEnabled = true;
         private boolean hideKeyboard = false;
         private TimeInterpolator interpolator = new DecelerateInterpolator();
 
         /**
          * <p>Construct a SlideUp by passing the view or his child to use for the generation</p>
          */
-        public Builder(@NonNull View sliderView) {
-            this.sliderView = sliderView;
-            density = sliderView.getContext().getResources().getDisplayMetrics().density;
-            touchableArea = 300 * density;
+        public Builder(@NonNull SlidingContentContainer sliderView) {
+            this.slidingContentContainer = sliderView;
         }
 
         /**
@@ -224,26 +213,6 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
         }
 
         /**
-         * <p>Define touchable area <b>(in dp)</b> for interaction</p>
-         *
-         * @param area <b>(default - <b color="#EF6C00">300dp</b>)</b>
-         */
-        public Builder withTouchableArea(float area) {
-            touchableArea = area * density;
-            return this;
-        }
-
-        /**
-         * <p>Turning on/off sliding on touch event</p>
-         *
-         * @param enabled <b>(default - <b color="#EF6C00">true</b>)</b>
-         */
-        public Builder withGesturesEnabled(boolean enabled) {
-            gesturesEnabled = enabled;
-            return this;
-        }
-
-        /**
          * <p>Define behavior of soft input</p>
          *
          * @param hide <b>(default - <b color="#EF6C00">false</b>)</b>
@@ -295,7 +264,6 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
                 startState = savedState.getParcelable(KEY_STATE);
             }
             debug = savedState.getBoolean(KEY_DEBUG, debug);
-            touchableArea = savedState.getFloat(KEY_TOUCHABLE_AREA, touchableArea) * density;
             autoSlideDuration = savedState.getInt(KEY_AUTO_SLIDE_DURATION, autoSlideDuration);
             hideKeyboard = savedState.getBoolean(KEY_HIDE_SOFT_INPUT, hideKeyboard);
         }
@@ -307,9 +275,9 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
      * @see InputMethodManager#hideSoftInputFromWindow(IBinder, int)
      */
     public void hideSoftInput() {
-        ((InputMethodManager) sliderView.getContext()
+        ((InputMethodManager) slidingContentContainer.getContext()
                 .getSystemService(Context.INPUT_METHOD_SERVICE))
-                .hideSoftInputFromWindow(sliderView.getWindowToken(),
+                .hideSoftInputFromWindow(slidingContentContainer.getWindowToken(),
                         InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
@@ -319,36 +287,33 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
      * @see InputMethodManager#showSoftInput(View, int)
      */
     public void showSoftInput() {
-        ((InputMethodManager) sliderView.getContext()
+        ((InputMethodManager) slidingContentContainer.getContext()
                 .getSystemService(Context.INPUT_METHOD_SERVICE))
-                .showSoftInput(sliderView, 0);
+                .showSoftInput(slidingContentContainer, 0);
     }
 
     private SlideUp(Builder builder) {
         listeners = builder.listeners;
-        sliderView = builder.sliderView;
+        slidingContentContainer = builder.slidingContentContainer;
         startState = builder.startState;
-        density = builder.density;
-        touchableArea = builder.touchableArea;
         autoSlideDuration = builder.autoSlideDuration;
         debug = builder.debug;
-        gesturesEnabled = builder.gesturesEnabled;
         hideKeyboard = builder.hideKeyboard;
         interpolator = builder.interpolator;
         init();
     }
 
     private void init() {
-        sliderView.setOnTouchListener(this);
+        slidingContentContainer.setOnTouchListener(this);
         createAnimation();
-        sliderView.getViewTreeObserver()
+        slidingContentContainer.getViewTreeObserver()
                 .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
                     public void onGlobalLayout() {
-                        viewHeight = sliderView.getHeight();
-                        sliderView.setPivotY(0);
+                        viewHeight = slidingContentContainer.getHeight();
+                        slidingContentContainer.setPivotY(0);
                         updateToCurrentState();
-                        ViewTreeObserver observer = sliderView.getViewTreeObserver();
+                        ViewTreeObserver observer = slidingContentContainer.getViewTreeObserver();
                         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
                             observer.removeGlobalOnLayoutListener(this);
                         } else {
@@ -379,7 +344,7 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
      * @return true if view have status {@link View#VISIBLE}
      */
     public boolean isVisible() {
-        return sliderView.getVisibility() == VISIBLE;
+        return slidingContentContainer.getVisibility() == VISIBLE;
     }
 
     /**
@@ -399,8 +364,8 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
     /**
      * <p>Returns typed view which was used as slider</p>
      */
-    public <T extends View> T getSliderView() {
-        return (T) sliderView;
+    public <T extends View> T getSlidingContentContainer() {
+        return (T) slidingContentContainer;
     }
 
     /**
@@ -419,22 +384,6 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
      */
     public float getAutoSlideDuration() {
         return this.autoSlideDuration;
-    }
-
-    /**
-     * <p>Set touchable area <b>(in dp)</b> for interaction</p>
-     *
-     * @param touchableArea <b>(default - <b color="#EF6C00">300dp</b>)</b>
-     */
-    public void setTouchableArea(float touchableArea) {
-        this.touchableArea = touchableArea * density;
-    }
-
-    /**
-     * <p>Returns touchable area <b>(in dp)</b> for interaction</p>
-     */
-    public float getTouchableArea() {
-        return this.touchableArea / density;
     }
 
     /**
@@ -488,22 +437,6 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
      */
     public boolean isLoggingEnabled() {
         return debug;
-    }
-
-    /**
-     * <p>Turning on/off gestures</p>
-     *
-     * @param enabled <b>(default - <b color="#EF6C00">true</b>)</b>
-     */
-    public void setGesturesEnabled(boolean enabled) {
-        this.gesturesEnabled = enabled;
-    }
-
-    /**
-     * <p>Returns current status of gestures</p>
-     */
-    public boolean isGesturesEnabled() {
-        return gesturesEnabled;
     }
 
     /**
@@ -571,7 +504,6 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
             savedState = Bundle.EMPTY;
         }
         savedState.putBoolean(KEY_DEBUG, debug);
-        savedState.putFloat(KEY_TOUCHABLE_AREA, touchableArea / density);
         savedState.putParcelable(KEY_STATE, currentState);
         savedState.putInt(KEY_AUTO_SLIDE_DURATION, autoSlideDuration);
         savedState.putBoolean(KEY_HIDE_SOFT_INPUT, hideKeyboard);
@@ -587,16 +519,17 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
     private void hide(boolean immediately) {
         endAnimation();
         if (immediately) {
-            if (sliderView.getHeight() > 0) {
-                sliderView.setTranslationY(viewHeight);
-                sliderView.setVisibility(GONE);
+            if (slidingContentContainer.getHeight() > 0) {
+                slidingContentContainer.setTranslationY(viewHeight);
+                slidingContentContainer.setVisibility(GONE);
                 notifyVisibilityChanged(GONE);
             } else {
                 startState = HIDDEN;
             }
         } else {
-            this.slideAnimationTo = sliderView.getHeight();
-            valueAnimator.setFloatValues(sliderView.getTranslationY(), slideAnimationTo);
+            this.slideAnimationTo = slidingContentContainer.getHeight();
+            valueAnimator
+                    .setFloatValues(slidingContentContainer.getTranslationY(), slideAnimationTo);
             valueAnimator.start();
         }
     }
@@ -604,16 +537,17 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
     private void show(boolean immediately) {
         endAnimation();
         if (immediately) {
-            if (sliderView.getHeight() > 0) {
-                sliderView.setTranslationY(0);
-                sliderView.setVisibility(VISIBLE);
+            if (slidingContentContainer.getHeight() > 0) {
+                slidingContentContainer.setTranslationY(0);
+                slidingContentContainer.setVisibility(VISIBLE);
                 notifyVisibilityChanged(VISIBLE);
             } else {
                 startState = SHOWED;
             }
         } else {
             this.slideAnimationTo = 750;
-            valueAnimator.setFloatValues(sliderView.getTranslationY(), slideAnimationTo);
+            valueAnimator
+                    .setFloatValues(slidingContentContainer.getTranslationY(), slideAnimationTo);
             valueAnimator.start();
         }
     }
@@ -628,9 +562,6 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
 
     @Override
     public final boolean onTouch(View v, MotionEvent event) {
-        if (!gesturesEnabled) {
-            return false;
-        }
         if (isAnimationRunning()) {
             return false;
         }
@@ -638,41 +569,30 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
     }
 
     private boolean onTouchDownToUp(MotionEvent event) {
-        float touchedArea = event.getRawY() - sliderView.getTop();
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                viewHeight = sliderView.getHeight();
+                viewHeight = slidingContentContainer.getHeight();
                 startPositionY = event.getRawY();
-                viewStartPositionY = sliderView.getTranslationY();
-                canSlide = (startState != SHOWED);
+                viewStartPositionY = slidingContentContainer.getTranslationY();
                 break;
             case MotionEvent.ACTION_MOVE:
                 float difference = event.getRawY() - startPositionY;
                 float moveTo = viewStartPositionY + difference;
-                float percents = moveTo * 100 / sliderView.getHeight();
+                float percents = moveTo * 100 / slidingContentContainer.getHeight();
 
-                if (moveTo > 0 && canSlide) {
+                if (moveTo > 0) {
                     notifyPercentChanged(percents);
-                    sliderView.setTranslationY(moveTo);
+                    slidingContentContainer.setTranslationY(moveTo);
                 }
                 if (event.getRawY() > maxSlidePosition) {
                     maxSlidePosition = event.getRawY();
                 }
                 break;
             case MotionEvent.ACTION_UP:
-                float slideAnimationFrom = sliderView.getTranslationY();
+                float slideAnimationFrom = slidingContentContainer.getTranslationY();
                 if (slideAnimationFrom == viewStartPositionY) {
                     return false;
                 }
-//                boolean mustShow = maxSlidePosition > event.getRawY();
-//                boolean scrollableAreaConsumed = sliderView.getTranslationY()
-//                        > sliderView.getHeight() / 5;
-//
-//                if (scrollableAreaConsumed && !mustShow) {
-//                    slideAnimationTo = sliderView.getHeight();
-//                } else {
-//                    slideAnimationTo = 0;
-//                }
                 float stop = 0;
                 if (slideAnimationFrom > 300) {
                     stop = 750;
@@ -680,7 +600,6 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
                 slideAnimationTo = stop;
                 valueAnimator.setFloatValues(slideAnimationFrom, stop);
                 valueAnimator.start();
-                canSlide = true;
                 maxSlidePosition = 0;
                 break;
         }
@@ -694,8 +613,8 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
     }
 
     private void onAnimationUpdateDownToUp(float value) {
-        sliderView.setTranslationY(value);
-        float visibleDistance = sliderView.getY() - sliderView.getTop();
+        slidingContentContainer.setTranslationY(value);
+        float visibleDistance = slidingContentContainer.getY() - slidingContentContainer.getTop();
         float percents = (visibleDistance) * 100 / viewHeight;
         notifyPercentChanged(percents);
     }
@@ -746,8 +665,8 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
 
     @Override
     public final void onAnimationStart(Animator animator) {
-        if (sliderView.getVisibility() != VISIBLE) {
-            sliderView.setVisibility(VISIBLE);
+        if (slidingContentContainer.getVisibility() != VISIBLE) {
+            slidingContentContainer.setVisibility(VISIBLE);
             notifyVisibilityChanged(VISIBLE);
         }
     }
@@ -755,8 +674,8 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
     @Override
     public final void onAnimationEnd(Animator animator) {
         if (slideAnimationTo != 0) {
-            if (sliderView.getVisibility() != GONE) {
-//                sliderView.setVisibility(GONE);
+            if (slidingContentContainer.getVisibility() != GONE) {
+//                slidingContentContainer.setVisibility(GONE);
                 notifyVisibilityChanged(GONE);
             }
         }

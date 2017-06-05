@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,23 +28,23 @@ public class SlideEndViewActivity extends AppCompatActivity {
         dim = findViewById(R.id.dim);
         fab = (FloatingActionButton) findViewById(R.id.fab);
 
-        slideUp = new SlideUp.Builder(sliderView)
-                .withListeners(new SlideUp.Listener() {
-                    @Override
-                    public void onSlide(float percent) {
-                        dim.setAlpha(1 - (percent / 100));
-                    }
-    
-                    @Override
-                    public void onVisibilityChanged(int visibility) {
-                        if (visibility == View.GONE){
-                            fab.show();
-                        }
-                    }
-                })
-                .withLoggingEnabled(true)
-                .withStartState(SlideUp.State.HIDDEN)
-                .build();
+//        slideUp = new SlideUp.Builder(sliderView)
+//                .withListeners(new SlideUp.Listener() {
+//                    @Override
+//                    public void onSlide(float percent) {
+//                        dim.setAlpha(1 - (percent / 100));
+//                    }
+//
+//                    @Override
+//                    public void onVisibilityChanged(int visibility) {
+//                        if (visibility == View.GONE){
+//                            fab.show();
+//                        }
+//                    }
+//                })
+//                .withLoggingEnabled(true)
+//                .withStartState(SlideUp.State.HIDDEN)
+//                .build();
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

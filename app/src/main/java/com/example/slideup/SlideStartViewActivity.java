@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.mancj.slideup.SlideUp;
+import com.mancj.slideup.SlidingContentContainer;
 
 public class SlideStartViewActivity extends AppCompatActivity {
 
@@ -19,13 +20,13 @@ public class SlideStartViewActivity extends AppCompatActivity {
     private void loadFragment() {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentSample fragment = new FragmentSample();
-        fragmentManager.beginTransaction().replace(R.id.slidingContentContainer, fragment).commitNow();
+        fragmentManager.beginTransaction().replace(R.id.slidingContentContainer, fragment)
+                .commitNow();
     }
 
     private void initSlider() {
-        new SlideUp.Builder(findViewById(R.id.slidingContentContainer))
+        new SlideUp.Builder((SlidingContentContainer) findViewById(R.id.slidingContentContainer))
                 .withLoggingEnabled(true)
-                .withTouchableArea(1000)
                 .withStartState(SlideUp.State.STOP)
                 .build();
     }

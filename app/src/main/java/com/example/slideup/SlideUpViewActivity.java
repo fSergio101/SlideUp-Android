@@ -29,23 +29,23 @@ public class SlideUpViewActivity extends AppCompatActivity {
         dim = findViewById(R.id.dim);
         fab = (FloatingActionButton) findViewById(R.id.fab);
 
-        slideUp = new SlideUp.Builder(sliderView)
-                .withListeners(new SlideUp.Listener() {
-                    @Override
-                    public void onSlide(float percent) {
-                        dim.setAlpha(1 - (percent / 100));
-                    }
-
-                    @Override
-                    public void onVisibilityChanged(int visibility) {
-                        if (visibility == View.GONE) {
-                            fab.show();
-                        }
-                    }
-                })
-                .withLoggingEnabled(true)
-                .withStartState(SlideUp.State.HIDDEN)
-                .build();
+//        slideUp = new SlideUp.Builder(sliderView)
+//                .withListeners(new SlideUp.Listener() {
+//                    @Override
+//                    public void onSlide(float percent) {
+//                        dim.setAlpha(1 - (percent / 100));
+//                    }
+//
+//                    @Override
+//                    public void onVisibilityChanged(int visibility) {
+//                        if (visibility == View.GONE) {
+//                            fab.show();
+//                        }
+//                    }
+//                })
+//                .withLoggingEnabled(true)
+//                .withStartState(SlideUp.State.HIDDEN)
+//                .build();
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
