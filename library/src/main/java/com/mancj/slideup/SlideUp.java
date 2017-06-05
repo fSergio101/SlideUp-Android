@@ -49,16 +49,28 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
          * State hidden is equal {@link View#GONE}
          */
         HIDDEN,
-        MIDDLE,
+        STOP,
 
         /**
          * State showed is equal {@link View#VISIBLE}
          */
         SHOWED;
 
+        private float position = 0f;
+
+        void setPosition(float position) {
+            if (this == STOP) {
+                this.position = position;
+            } else {
+                throw new IllegalStateException();
+            }
+
+        }
+
         @Override
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeInt(ordinal());
+            dest.writeFloat(position);
         }
 
         @Override
@@ -69,7 +81,11 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
         public static final Creator<State> CREATOR = new Creator<State>() {
             @Override
             public State createFromParcel(Parcel in) {
-                return State.values()[in.readInt()];
+                State state = State.values()[in.readInt()];
+                if (state == STOP) {
+                    state.setPosition(in.readFloat());
+                }
+                return state;
             }
 
             @Override
@@ -351,7 +367,7 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
             case SHOWED:
                 showImmediately();
                 break;
-            case MIDDLE:
+            case STOP:
                 show();
                 break;
         }
@@ -628,7 +644,7 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
                 viewHeight = sliderView.getHeight();
                 startPositionY = event.getRawY();
                 viewStartPositionY = sliderView.getTranslationY();
-                canSlide = touchableArea >= touchedArea;
+                canSlide = (startState != SHOWED);
                 break;
             case MotionEvent.ACTION_MOVE:
                 float difference = event.getRawY() - startPositionY;

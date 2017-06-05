@@ -3,7 +3,6 @@ package com.example.slideup;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 
 import com.mancj.slideup.SlideUp;
 
@@ -13,16 +12,21 @@ public class SlideStartViewActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_slide_start_view);
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentSample fragment = new FragmentSample();
-        fragmentManager.beginTransaction().replace(R.id.fragmentContainer, fragment).commitNow();
+        initSlider();
+        loadFragment();
     }
 
-    public void setView(View view) {
-        new SlideUp.Builder(view)
+    private void loadFragment() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentSample fragment = new FragmentSample();
+        fragmentManager.beginTransaction().replace(R.id.slidingContentContainer, fragment).commitNow();
+    }
+
+    private void initSlider() {
+        new SlideUp.Builder(findViewById(R.id.slidingContentContainer))
                 .withLoggingEnabled(true)
                 .withTouchableArea(1000)
-                .withStartState(SlideUp.State.MIDDLE)
+                .withStartState(SlideUp.State.STOP)
                 .build();
     }
 
