@@ -19,4 +19,48 @@ public class FragmentSample extends Fragment implements SliderContent {
         return view;
     }
 
+    @Override
+    public int getStopCount() {
+        return 0;
+    }
+
+    @Override
+    public int getElementsCount() {
+        return 0;
+    }
+
+    @Override
+    public int getStopHeight() {
+        return 0;
+    }
+
+    @Override
+    public int getVisibleContentHeightAtStopIndex(int stop) {
+        return 0;
+    }
+
+    @Override
+    public int getStopIndexForVissibleHeight(int height) {
+        return 0;
+    }
+
+    @Override
+    public int getInitialStopPoint() {
+        return 0;
+    }
+
+    @Override
+    public int getInitialStopVisibleElements() {
+        return 0;
+    }
+
+    @Override
+    public int getInitialStopVisiblePixels() {
+        return 0;
+    }
+
+    @Override
+    public int calculateFollowingStop(int currentStop, int initialPosition, int displacement) {
+        return 0;
+    }
 }
