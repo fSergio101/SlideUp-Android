@@ -17,7 +17,10 @@ public class SlidingContentContainer extends FrameLayout {
     private ViewDragHelper dragHelper;
     private DragViewHelperCallback dragHelperCallback;
     private ViewGroup rootView;
-    private SlideUp.State initialState;
+    private SliderContent sliderContent;
+    private SliderFuturePositionStrategy sliderFuturePositionStrategy;
+    private OnAttachedToWindowListener onAttachedToWindowListener;
+    private float maxContainerSize;
 
     public SlidingContentContainer(@NonNull Context context) {
         super(context);
@@ -33,6 +36,42 @@ public class SlidingContentContainer extends FrameLayout {
         LayoutInflater layoutInflater = LayoutInflater.from(getContext());
         layoutInflater.inflate(R.layout.slider_content_wrapper, this, true);
     }
+
+    public SlideUp.State computeFollowingStop(
+            final float viewStartPositionY,
+            final float slideAnimationFrom,
+            final SlideUp.State currentState) {
+
+        SliderFuturePosition sliderFuturePosition = sliderFuturePositionStrategy
+                .calculateStopPosition(
+                        viewStartPositionY,
+                        slideAnimationFrom,
+                        currentState
+                );
+
+        return sliderFuturePositionToSlideUpState(sliderFuturePosition);
+    }
+
+    public SlideUp.State getInitialState() {
+
+        SliderFuturePosition initialState = sliderFuturePositionStrategy.getInitialState();
+
+        return sliderFuturePositionToSlideUpState(initialState);
+    }
+
+    private SlideUp.State sliderFuturePositionToSlideUpState(
+            SliderFuturePosition sliderFuturePosition) {
+        SlideUp.State state;
+        if (sliderFuturePosition.isMax()) {
+            state = SlideUp.State.SHOWED;
+        } else {
+            state = SlideUp.State.STOP;
+            state.setPosition(sliderFuturePosition.getPosition());
+        }
+        return state;
+    }
+
+    // region touch intercepting
 
     @Override
     protected void onAttachedToWindow() {
@@ -62,41 +101,22 @@ public class SlidingContentContainer extends FrameLayout {
         }
     }
 
-    public SlideUp.State computeFollowingStop(
-            float viewStartPositionY,
-            float slideAnimationFrom,
-            SlideUp.State currentState) {
-        float delta = slideAnimationFrom - viewStartPositionY;
-        float scrollTo = normalize(delta, viewStartPositionY);
-        SlideUp.State state = SlideUp.State.STOP;
-        state.setPosition(scrollTo);
-        return state;
+    public void setOnAttachedToWindowListener(
+            OnAttachedToWindowListener onAttachedToWindowListener) {
+        this.onAttachedToWindowListener = onAttachedToWindowListener;
     }
 
-    private float normalize(float delta, float previous) {
-        if (delta < 0) {
-            //subir
-            if (delta < -50) {
-                return previous - 100;
-            } else {
-                return previous;
-            }
-        } else {
-            //subir
-            if (delta > 50) {
-                return previous + 100;
-            } else {
-                return previous;
-            }
-        }
+    public void setSliderContent(SliderContent sliderContent, float viewHeight) {
+        this.sliderContent = sliderContent;
+        this.maxContainerSize = viewHeight;
     }
 
-    public SlideUp.State getInitialState() {
-        SlideUp.State state = SlideUp.State.STOP;
-        state.setPosition(750);
-        return state;
+    public void onAppearOnScreen() {
+        sliderFuturePositionStrategy = new RangeStrategy(sliderContent, maxContainerSize);
     }
 
+    //TODO this class stuff will be the one who intercept the grad events in order to avoid scroll
+    // for cases in which our component won't be expanded
     private class DragViewHelperCallback extends ViewDragHelper.Callback {
 
         @Override
@@ -129,6 +149,24 @@ public class SlidingContentContainer extends FrameLayout {
             }
             invalidate();
         }
-
     }
+    // endregion touch intercepting
+
+    //    private float normalize(float delta, float previous) {
+//        if (delta < 0) {
+//            //subir
+//            if (delta < -50) {
+//                return previous - 100;
+//            } else {
+//                return previous;
+//            }
+//        } else {
+//            //subir
+//            if (delta > 50) {
+//                return previous + 100;
+//            } else {
+//                return previous;
+//            }
+//        }
+//    }
 }

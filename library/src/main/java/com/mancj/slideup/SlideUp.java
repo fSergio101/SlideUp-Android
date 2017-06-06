@@ -318,16 +318,26 @@ public class SlideUp implements View.OnTouchListener, ValueAnimator.AnimatorUpda
                         viewHeight = slidingContentContainer.getHeight();
                         slidingContentContainer.setPivotY(0);
 //                        updateToCurrentState();
+                        slidingContentContainer.onAppearOnScreen();
                         ViewTreeObserver observer = slidingContentContainer.getViewTreeObserver();
                         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
                             observer.removeGlobalOnLayoutListener(this);
                         } else {
                             observer.removeOnGlobalLayoutListener(this);
                         }
+                        slidingContentContainer.setVisibility(VISIBLE);
+                        show();
                     }
                 });
+//        slidingContentContainer.setOnAttachedToWindowListener(new OnAttachedToWindowListener() {
+//            @Override
+//            public void attached() {
+////                if ()
+////                show();
+//            }
+//        });
 //        updateToCurrentState();
-        show();
+//        show();
     }
 
 //    private void updateToCurrentState() {
